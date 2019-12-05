@@ -3,18 +3,23 @@
            https://api.github.com/users/<your name>
 */
 
-function getGHUser(username) {
-  axios.get('https://api.github.com/users/' + username)
+axios.get('https://api.github.com/users/vincesanders')
   .then(res => {
     const newCard = githubUserCardCreator(res);
     const cardContainer = document.querySelector('.cards');
     cardContainer.appendChild(newCard);
+    return res;
+  }).then(res => {
+    axios.get(res.data.followers_url).then(newRes => {   //getfollowers_url data
+      newRes.data.forEach(followerObj => {               //github returns an array of objects, each is a follower
+        getGHUser(followerObj.login);                    //create a card for each
+      });
+    }).catch(err => {
+      console.log(err);
+    });
   }).catch(err => {
     console.log(err);
   });
-}
-
-getGHUser('vincesanders');
 
 /* Step 2: Inspect and study the data coming back, this is YOUR 
    github info! You will need to understand the structure of this 
@@ -109,6 +114,17 @@ function githubUserCardCreator(res) {
   card.append(userImg, cardInfo);
 
   return card;
+}
+
+function getGHUser(username) {
+  axios.get('https://api.github.com/users/' + username)
+  .then(res => {
+    const newCard = githubUserCardCreator(res);
+    const cardContainer = document.querySelector('.cards');
+    cardContainer.appendChild(newCard);
+  }).catch(err => {
+    console.log(err);
+  });
 }
 
 /* List of LS Instructors Github username's: 
